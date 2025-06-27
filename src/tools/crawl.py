@@ -16,6 +16,7 @@ logger = logging.getLogger(__name__)
 @log_io
 def crawl_tool(
     url: Annotated[str, "The url to crawl."],
+    config: dict = None,
 ) -> str:
     """Use this to crawl a url and get a readable content in markdown format."""
     try:

@@ -27,9 +27,40 @@ export function mergeMessage(message: Message, event: ChatEvent) {
     message.finishReason = event.data.finish_reason;
     message.isStreaming = false;
     if (message.toolCalls) {
-      message.toolCalls.forEach((toolCall) => {
+      message.toolCalls.forEach((toolCall, index) => {
         if (toolCall.argsChunks?.length) {
-          toolCall.args = JSON.parse(toolCall.argsChunks.join(""));
+          const argsString = toolCall.argsChunks.join("");
+
+          console.debug(`Processing tool call ${index} args:`, {
+            toolName: toolCall.name || "unknown",
+            toolId: toolCall.id,
+            chunksCount: toolCall.argsChunks.length,
+            totalLength: argsString.length,
+            argsPreview:
+              argsString.length > 200
+                ? argsString.substring(0, 200) + "..."
+                : argsString,
+          });
+
+          try {
+            toolCall.args = JSON.parse(argsString);
+            console.debug(`Successfully parsed tool call ${index} args:`, {
+              toolName: toolCall.name,
+              toolId: toolCall.id,
+              parsedArgs: toolCall.args,
+            });
+          } catch (error) {
+            console.error("Failed to parse tool call args:", {
+              error: error,
+              toolCallIndex: index,
+              toolName: toolCall.name || "unknown",
+              toolId: toolCall.id,
+              argsString: argsString,
+              chunks: toolCall.argsChunks,
+              stack: error instanceof Error ? error.stack : undefined,
+            });
+            toolCall.args = {};
+          }
           delete toolCall.argsChunks;
         }
       });
@@ -44,7 +75,8 @@ function mergeTextMessage(message: Message, event: MessageChunkEvent) {
     message.contentChunks.push(event.data.content);
   }
   if (event.data.reasoning_content) {
-    message.reasoningContent = (message.reasoningContent ?? "") + event.data.reasoning_content;
+    message.reasoningContent =
+      (message.reasoningContent ?? "") + event.data.reasoning_content;
     message.reasoningContentChunks = message.reasoningContentChunks ?? [];
     message.reasoningContentChunks.push(event.data.reasoning_content);
   }

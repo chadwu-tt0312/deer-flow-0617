@@ -17,14 +17,15 @@ logger = logging.getLogger(__name__)
 
 def script_writer_node(state: PodcastState):
     logger.info("Generating script for podcast...")
-    model = get_llm_by_type(
-        AGENT_LLM_MAP["podcast_script_writer"]
-    ).with_structured_output(Script, method="json_mode")
+    model = get_llm_by_type(AGENT_LLM_MAP["podcast_script_writer"]).with_structured_output(
+        Script, method="json_mode"
+    )
     script = model.invoke(
         [
             SystemMessage(content=get_prompt_template("podcast/podcast_script_writer")),
             HumanMessage(content=state["input"]),
         ],
     )
-    print(script)
+    logger.info(f"Generated podcast script: {script}")
+    print(script)  # 保持控制台輸出
     return {"script": script, "audio_chunks": []}

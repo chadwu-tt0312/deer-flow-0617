@@ -19,16 +19,71 @@ export const Link = ({
     const links = new Set<string>();
     if (!checkLinkCredibility) return links;
 
-    (toolCalls || []).forEach((call) => {
+    console.debug(
+      "Link credibility check starting with",
+      toolCalls?.length || 0,
+      "tool calls",
+    );
+
+    (toolCalls || []).forEach((call, index) => {
       if (call && call.name === "web_search" && call.result) {
-        const result = JSON.parse(call.result) as Array<{ url: string }>;
-        result.forEach((r) => {
-          // encodeURI is used to handle the case where the link contains chinese or other special characters
-          links.add(encodeURI(r.url));
-          links.add(r.url);
+        console.debug(`Processing web_search tool call ${index}:`, {
+          name: call.name,
+          resultType: typeof call.result,
+          resultLength: call.result.length,
+          resultPreview:
+            call.result.length > 200
+              ? call.result.substring(0, 200) + "..."
+              : call.result,
         });
+
+        try {
+          // 檢查結果是否為有效的 JSON
+          const result = JSON.parse(call.result) as Array<{ url: string }>;
+
+          console.debug(`Parsed web_search result ${index}:`, {
+            type: typeof result,
+            isArray: Array.isArray(result),
+            length: Array.isArray(result) ? result.length : "N/A",
+            result: result,
+          });
+
+          if (Array.isArray(result)) {
+            result.forEach((r, rIndex) => {
+              if (r && r.url) {
+                console.debug(
+                  `Adding credible link ${index}-${rIndex}:`,
+                  r.url,
+                );
+                // encodeURI is used to handle the case where the link contains chinese or other special characters
+                links.add(encodeURI(r.url));
+                links.add(r.url);
+              } else {
+                console.debug(
+                  `Skipping invalid result item ${index}-${rIndex}:`,
+                  r,
+                );
+              }
+            });
+          }
+        } catch (error) {
+          // 如果 JSON 解析失敗，記錄錯誤但不中斷執行
+          console.error("Failed to parse web search result as JSON:", {
+            error: error,
+            callIndex: index,
+            callName: call.name,
+            result: call.result,
+            resultType: typeof call.result,
+            stack: error instanceof Error ? error.stack : undefined,
+          });
+        }
       }
     });
+
+    console.debug(
+      `Link credibility check completed. Found ${links.size} credible links:`,
+      Array.from(links),
+    );
     return links;
   }, [toolCalls]);
 

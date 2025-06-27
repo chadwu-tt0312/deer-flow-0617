@@ -74,10 +74,14 @@ function ActivityMessage({ messageId }: { messageId: string }) {
   if (message?.agent && message.content) {
     if (message.agent !== "reporter" && message.agent !== "planner") {
       return (
-        <div className="px-4 py-2">
-          <Markdown animated checkLinkCredibility>
-            {message.content}
-          </Markdown>
+        <div className="overflow-wrap-anywhere max-w-full px-4 py-2 break-words">
+          <div className="prose-content w-full max-w-none overflow-hidden break-words">
+            <div className="prose prose-sm overflow-wrap-anywhere word-break-break-word max-w-none break-words">
+              <Markdown animated checkLinkCredibility>
+                {message.content}
+              </Markdown>
+            </div>
+          </div>
         </div>
       );
     }
@@ -151,6 +155,7 @@ function WebSearchToolCall({ toolCall }: { toolCall: ToolCallRuntime }) {
     () => searchResults?.filter((result) => result.type === "image"),
     [searchResults],
   );
+
   return (
     <section className="mt-4 pl-4">
       <div className="font-medium italic">
@@ -158,9 +163,9 @@ function WebSearchToolCall({ toolCall }: { toolCall: ToolCallRuntime }) {
           className="flex items-center"
           animated={searchResults === undefined}
         >
-          <Search size={16} className={"mr-2"} />
+          <Search size={16} className={"mr-2 flex-shrink-0"} />
           <span>Searching for&nbsp;</span>
-          <span className="max-w-[500px] overflow-hidden text-ellipsis whitespace-nowrap">
+          <span className="overflow-wrap-anywhere break-words">
             {(toolCall.args as { query: string }).query}
           </span>
         </RainbowText>
@@ -185,7 +190,7 @@ function WebSearchToolCall({ toolCall }: { toolCall: ToolCallRuntime }) {
               .map((searchResult, i) => (
                 <motion.li
                   key={`search-result-${i}`}
-                  className="text-muted-foreground bg-accent flex max-w-40 gap-2 rounded-md px-2 py-1 text-sm"
+                  className="text-muted-foreground bg-accent flex h-auto min-h-[40px] w-40 flex-col gap-2 rounded-md px-2 py-1 text-sm"
                   initial={{ opacity: 0, y: 10, scale: 0.66 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   transition={{
@@ -194,14 +199,20 @@ function WebSearchToolCall({ toolCall }: { toolCall: ToolCallRuntime }) {
                     ease: "easeOut",
                   }}
                 >
-                  <FavIcon
-                    className="mt-1"
-                    url={searchResult.url}
-                    title={searchResult.title}
-                  />
-                  <a href={searchResult.url} target="_blank">
-                    {searchResult.title}
-                  </a>
+                  <div className="flex items-start gap-2">
+                    <FavIcon
+                      className="mt-1 flex-shrink-0"
+                      url={searchResult.url}
+                      title={searchResult.title}
+                    />
+                    <a
+                      href={searchResult.url}
+                      target="_blank"
+                      className="overflow-wrap-anywhere text-xs leading-tight break-words"
+                    >
+                      {searchResult.title}
+                    </a>
+                  </div>
                 </motion.li>
               ))}
             {imageResults.map((searchResult, i) => (
@@ -250,13 +261,13 @@ function CrawlToolCall({ toolCall }: { toolCall: ToolCallRuntime }) {
           className="flex items-center text-base font-medium italic"
           animated={toolCall.result === undefined}
         >
-          <BookOpenText size={16} className={"mr-2"} />
+          <BookOpenText size={16} className={"mr-2 flex-shrink-0"} />
           <span>Reading</span>
         </RainbowText>
       </div>
       <ul className="mt-2 flex flex-wrap gap-4">
         <motion.li
-          className="text-muted-foreground bg-accent flex h-40 w-40 gap-2 rounded-md px-2 py-1 text-sm"
+          className="text-muted-foreground bg-accent flex h-auto min-h-[40px] w-40 flex-col gap-2 rounded-md px-2 py-1 text-sm"
           initial={{ opacity: 0, y: 10, scale: 0.66 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{
@@ -264,14 +275,16 @@ function CrawlToolCall({ toolCall }: { toolCall: ToolCallRuntime }) {
             ease: "easeOut",
           }}
         >
-          <FavIcon className="mt-1" url={url} title={title} />
-          <a
-            className="h-full flex-grow overflow-hidden text-ellipsis whitespace-nowrap"
-            href={url}
-            target="_blank"
-          >
-            {title ?? url}
-          </a>
+          <div className="flex items-start gap-2">
+            <FavIcon className="mt-1 flex-shrink-0" url={url} title={title} />
+            <a
+              className="overflow-wrap-anywhere text-xs leading-tight break-words"
+              href={url}
+              target="_blank"
+            >
+              {title ?? url}
+            </a>
+          </div>
         </motion.li>
       </ul>
     </section>
@@ -291,9 +304,9 @@ function RetrieverToolCall({ toolCall }: { toolCall: ToolCallRuntime }) {
     <section className="mt-4 pl-4">
       <div className="font-medium italic">
         <RainbowText className="flex items-center" animated={searching}>
-          <Search size={16} className={"mr-2"} />
+          <Search size={16} className={"mr-2 flex-shrink-0"} />
           <span>Retrieving documents from RAG&nbsp;</span>
-          <span className="max-w-[500px] overflow-hidden text-ellipsis whitespace-nowrap">
+          <span className="overflow-wrap-anywhere break-words">
             {(toolCall.args as { keywords: string }).keywords}
           </span>
         </RainbowText>
@@ -316,7 +329,7 @@ function RetrieverToolCall({ toolCall }: { toolCall: ToolCallRuntime }) {
             {documents.map((doc, i) => (
               <motion.li
                 key={`search-result-${i}`}
-                className="text-muted-foreground bg-accent flex max-w-40 gap-2 rounded-md px-2 py-1 text-sm"
+                className="text-muted-foreground bg-accent flex h-auto min-h-[40px] w-40 flex-col gap-2 rounded-md px-2 py-1 text-sm"
                 initial={{ opacity: 0, y: 10, scale: 0.66 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 transition={{
@@ -325,8 +338,12 @@ function RetrieverToolCall({ toolCall }: { toolCall: ToolCallRuntime }) {
                   ease: "easeOut",
                 }}
               >
-                <FileText size={32} />
-                {doc.title}
+                <div className="flex items-start gap-2">
+                  <FileText size={16} className="mt-1 flex-shrink-0" />
+                  <span className="overflow-wrap-anywhere text-xs leading-tight break-words">
+                    {doc.title}
+                  </span>
+                </div>
               </motion.li>
             ))}
           </ul>
@@ -344,7 +361,7 @@ function PythonToolCall({ toolCall }: { toolCall: ToolCallRuntime }) {
   return (
     <section className="mt-4 pl-4">
       <div className="flex items-center">
-        <PythonOutlined className={"mr-2"} />
+        <PythonOutlined className={"mr-2 flex-shrink-0"} />
         <RainbowText
           className="text-base font-medium italic"
           animated={toolCall.result === undefined}
@@ -353,7 +370,7 @@ function PythonToolCall({ toolCall }: { toolCall: ToolCallRuntime }) {
         </RainbowText>
       </div>
       <div>
-        <div className="bg-accent mt-2 max-h-[400px] max-w-[calc(100%-120px)] overflow-y-auto rounded-md p-2 text-sm">
+        <div className="bg-accent mt-2 max-h-[400px] w-full overflow-x-auto overflow-y-auto rounded-md p-2 text-sm">
           <SyntaxHighlighter
             language="python"
             style={resolvedTheme === "dark" ? dark : docco}
@@ -361,6 +378,8 @@ function PythonToolCall({ toolCall }: { toolCall: ToolCallRuntime }) {
               background: "transparent",
               border: "none",
               boxShadow: "none",
+              whiteSpace: "pre-wrap",
+              wordBreak: "break-word",
             }}
           >
             {code?.trim() ?? ""}
@@ -401,7 +420,7 @@ function PythonToolCallResult({ result }: { result: string }) {
       <div className="mt-4 font-medium italic">
         {hasError ? "Error when executing the above code" : "Execution output"}
       </div>
-      <div className="bg-accent mt-2 max-h-[400px] max-w-[calc(100%-120px)] overflow-y-auto rounded-md p-2 text-sm">
+      <div className="bg-accent mt-2 max-h-[400px] w-full overflow-x-auto overflow-y-auto rounded-md p-2 text-sm">
         <SyntaxHighlighter
           language="plaintext"
           style={resolvedTheme === "dark" ? dark : docco}
@@ -410,6 +429,8 @@ function PythonToolCallResult({ result }: { result: string }) {
             background: "transparent",
             border: "none",
             boxShadow: "none",
+            whiteSpace: "pre-wrap",
+            wordBreak: "break-word",
           }}
         >
           {error ?? stdout ?? "(empty)"}
@@ -424,15 +445,15 @@ function MCPToolCall({ toolCall }: { toolCall: ToolCallRuntime }) {
   const { resolvedTheme } = useTheme();
   return (
     <section className="mt-4 pl-4">
-      <div className="w-fit overflow-y-auto rounded-md py-0">
+      <div className="w-full overflow-hidden rounded-md py-0">
         <Accordion type="single" collapsible className="w-full">
           <AccordionItem value="item-1">
-            <AccordionTrigger>
+            <AccordionTrigger className="text-left">
               <Tooltip title={tool?.description}>
                 <div className="flex items-center font-medium italic">
-                  <PencilRuler size={16} className={"mr-2"} />
+                  <PencilRuler size={16} className={"mr-2 flex-shrink-0"} />
                   <RainbowText
-                    className="pr-0.5 text-base font-medium italic"
+                    className="overflow-wrap-anywhere pr-0.5 text-base font-medium break-words italic"
                     animated={toolCall.result === undefined}
                   >
                     Running {toolCall.name ? toolCall.name + "()" : "MCP tool"}
@@ -442,7 +463,7 @@ function MCPToolCall({ toolCall }: { toolCall: ToolCallRuntime }) {
             </AccordionTrigger>
             <AccordionContent>
               {toolCall.result && (
-                <div className="bg-accent max-h-[400px] max-w-[560px] overflow-y-auto rounded-md text-sm">
+                <div className="bg-accent max-h-[400px] w-full overflow-x-auto overflow-y-auto rounded-md text-sm">
                   <SyntaxHighlighter
                     language="json"
                     style={resolvedTheme === "dark" ? dark : docco}
@@ -450,6 +471,8 @@ function MCPToolCall({ toolCall }: { toolCall: ToolCallRuntime }) {
                       background: "transparent",
                       border: "none",
                       boxShadow: "none",
+                      whiteSpace: "pre-wrap",
+                      wordBreak: "break-word",
                     }}
                   >
                     {toolCall.result.trim()}

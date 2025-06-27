@@ -18,7 +18,7 @@ venv/
 .env
 
 # user conf
-conf.yaml
+#conf.yaml
 
 .idea/
 .langgraph_api/
@@ -26,3 +26,7 @@ conf.yaml
 # coverage report
 coverage.xml
 coverage/
+
+logs/
+*.log
+*.log.*

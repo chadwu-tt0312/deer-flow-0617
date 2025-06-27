@@ -104,7 +104,7 @@ export function MessageListView({
             onToggleResearch={handleToggleResearch}
           />
         ))}
-        <div className="flex h-8 w-full shrink-0"></div>
+        <div className="flex h-16 w-full shrink-0"></div>
       </ul>
       {responding && (noOngoingResearch || !ongoingResearchIsOpen) && (
         <LoadingAnimation className="ml-4" />
@@ -510,8 +510,8 @@ function PlanCard({
                 </ul>
               )}
             </CardContent>
-            <CardFooter className="flex justify-end">
-              {!message.isStreaming && interruptMessage?.options?.length && (
+            {!message.isStreaming && interruptMessage?.options?.length && (
+              <CardFooter className="flex justify-end">
                 <motion.div
                   className="flex gap-2"
                   initial={{ opacity: 0, y: 12 }}
@@ -539,8 +539,8 @@ function PlanCard({
                     </Button>
                   ))}
                 </motion.div>
-              )}
-            </CardFooter>
+              </CardFooter>
+            )}
           </Card>
         </motion.div>
       )}

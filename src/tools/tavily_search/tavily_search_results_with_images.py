@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: MIT
 
 import json
+import logging
 from typing import Dict, List, Optional, Tuple, Union
 
 from langchain.callbacks.manager import (
@@ -14,6 +15,8 @@ from pydantic import Field
 from src.tools.tavily_search.tavily_search_api_wrapper import (
     EnhancedTavilySearchAPIWrapper,
 )
+
+logger = logging.getLogger(__name__)
 
 
 class TavilySearchResultsWithImages(TavilySearchResults):  # type: ignore[override, override]
@@ -99,7 +102,9 @@ class TavilySearchResultsWithImages(TavilySearchResults):  # type: ignore[overri
     Default is False.
     """
 
-    api_wrapper: EnhancedTavilySearchAPIWrapper = Field(default_factory=EnhancedTavilySearchAPIWrapper)  # type: ignore[arg-type]
+    api_wrapper: EnhancedTavilySearchAPIWrapper = Field(
+        default_factory=EnhancedTavilySearchAPIWrapper
+    )  # type: ignore[arg-type]
 
     def _run(
         self,
@@ -123,7 +128,23 @@ class TavilySearchResultsWithImages(TavilySearchResults):  # type: ignore[overri
         except Exception as e:
             return repr(e), {}
         cleaned_results = self.api_wrapper.clean_results_with_images(raw_results)
-        print("sync", json.dumps(cleaned_results, indent=2, ensure_ascii=False))
+
+        # 記錄詳細的結果信息
+        logger.debug(f"Tavily search sync - Raw results type: {type(raw_results)}")
+        logger.debug(f"Tavily search sync - Cleaned results type: {type(cleaned_results)}")
+
+        try:
+            results_json = json.dumps(cleaned_results, indent=2, ensure_ascii=False)
+            logger.info(f"Tavily search sync results: {results_json}")
+            print("sync", results_json)  # 保持控制台輸出
+        except (TypeError, ValueError) as e:
+            logger.error(f"Failed to serialize Tavily search results to JSON: {e}")
+            logger.error(f"Cleaned results: {cleaned_results}")
+            # 如果 JSON 序列化失敗，返回字符串表示
+            fallback_result = str(cleaned_results)
+            logger.info(f"Tavily search sync results (fallback): {fallback_result}")
+            print("sync", fallback_result)
+
         return cleaned_results, raw_results
 
     async def _arun(
@@ -147,5 +168,21 @@ class TavilySearchResultsWithImages(TavilySearchResults):  # type: ignore[overri
         except Exception as e:
             return repr(e), {}
         cleaned_results = self.api_wrapper.clean_results_with_images(raw_results)
-        print("async", json.dumps(cleaned_results, indent=2, ensure_ascii=False))
+
+        # 記錄詳細的結果信息
+        logger.debug(f"Tavily search async - Raw results type: {type(raw_results)}")
+        logger.debug(f"Tavily search async - Cleaned results type: {type(cleaned_results)}")
+
+        try:
+            results_json = json.dumps(cleaned_results, indent=2, ensure_ascii=False)
+            logger.info(f"Tavily search async results: {results_json}")
+            # print("async", results_json)  # 保持控制台輸出  #TODO: 目前只有這一行輸出，暫時 mark 掉
+        except (TypeError, ValueError) as e:
+            logger.error(f"Failed to serialize Tavily search async results to JSON: {e}")
+            logger.error(f"Cleaned results: {cleaned_results}")
+            # 如果 JSON 序列化失敗，返回字符串表示
+            fallback_result = str(cleaned_results)
+            logger.info(f"Tavily search async results (fallback): {fallback_result}")
+            print("async", fallback_result)
+
         return cleaned_results, raw_results

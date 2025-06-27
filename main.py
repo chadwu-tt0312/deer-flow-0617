@@ -12,6 +12,7 @@ from InquirerPy import inquirer
 
 from src.config.questions import BUILT_IN_QUESTIONS, BUILT_IN_QUESTIONS_ZH_CN
 from src.workflow import run_agent_workflow_async
+from src.utils.logging_config import setup_deerflow_logging
 
 
 def ask(
@@ -62,28 +63,18 @@ def main(
     ).execute()
 
     # Choose questions based on language
-    questions = (
-        BUILT_IN_QUESTIONS if language == "English" else BUILT_IN_QUESTIONS_ZH_CN
-    )
-    ask_own_option = (
-        "[Ask my own question]" if language == "English" else "[自定义问题]"
-    )
+    questions = BUILT_IN_QUESTIONS if language == "English" else BUILT_IN_QUESTIONS_ZH_CN
+    ask_own_option = "[Ask my own question]" if language == "English" else "[自定义问题]"
 
     # Select a question
     initial_question = inquirer.select(
-        message=(
-            "What do you want to know?" if language == "English" else "您想了解什么?"
-        ),
+        message=("What do you want to know?" if language == "English" else "您想了解什么?"),
         choices=[ask_own_option] + questions,
     ).execute()
 
     if initial_question == ask_own_option:
         initial_question = inquirer.text(
-            message=(
-                "What do you want to know?"
-                if language == "English"
-                else "您想了解什么?"
-            ),
+            message=("What do you want to know?" if language == "English" else "您想了解什么?"),
         ).execute()
 
     # Pass all parameters to ask function
@@ -124,8 +115,23 @@ if __name__ == "__main__":
         dest="enable_background_investigation",
         help="Disable background investigation before planning",
     )
+    parser.add_argument(
+        "--no-log-file",
+        action="store_false",
+        dest="log_to_file",
+        help="Disable logging to file",
+    )
+    parser.add_argument(
+        "--log-dir",
+        type=str,
+        default="logs",
+        help="Directory to store log files (default: logs)",
+    )
 
     args = parser.parse_args()
+
+    # 設定日誌配置
+    setup_deerflow_logging(debug=args.debug, log_to_file=args.log_to_file, log_dir=args.log_dir)
 
     if args.interactive:
         # Pass command line arguments to main function

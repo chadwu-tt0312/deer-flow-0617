@@ -36,19 +36,25 @@ _config_cache: Dict[str, Dict[str, Any]] = {}
 
 def load_yaml_config(file_path: str) -> Dict[str, Any]:
     """Load and process YAML configuration file."""
-    # 如果文件不存在，返回{}
+    # 如果檔案不存在，返回{}
     if not os.path.exists(file_path):
         return {}
 
-    # 检查缓存中是否已存在配置
+    # 檢查快取中是否已存在配置
     if file_path in _config_cache:
         return _config_cache[file_path]
 
-    # 如果缓存中不存在，则加载并处理配置
-    with open(file_path, "r") as f:
-        config = yaml.safe_load(f)
+    # 如果快取中不存在，則載入並處理配置
+    try:
+        with open(file_path, "r", encoding="utf-8") as f:
+            config = yaml.safe_load(f)
+    except UnicodeDecodeError:
+        # 如果 UTF-8 解碼失敗，嘗試使用系統預設編碼
+        with open(file_path, "r", encoding="utf-8", errors="ignore") as f:
+            config = yaml.safe_load(f)
+
     processed_config = process_dict(config)
 
-    # 将处理后的配置存入缓存
+    # 將處理後的配置存入快取
     _config_cache[file_path] = processed_config
     return processed_config

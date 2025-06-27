@@ -7,6 +7,7 @@
     "build": "next build",
     "check": "next lint && tsc --noEmit",
     "dev": "dotenv -e ../.env -- next dev --turbo",
+    "dev:warm": "node scripts/dev-with-warmup.js",
     "scan": "next dev & npx react-scan@latest localhost:3000",
     "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,mdx}\" --cache",
     "format:write": "prettier --write \"**/*.{ts,tsx,js,jsx,mdx}\" --cache",
@@ -105,7 +106,7 @@
   "ct3aMetadata": {
     "initVersion": "7.39.3"
   },
-  "packageManager": "pnpm@10.6.5",
+  "packageManager": "pnpm@10.12.2",
   "pnpm": {
     "ignoredBuiltDependencies": [
       "sharp"

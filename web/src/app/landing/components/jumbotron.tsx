@@ -45,7 +45,11 @@ export function Jumbotron() {
           podcasts.
         </p>
         <div className="flex gap-6">
-          <Button className="hidden text-lg md:flex md:w-42" size="lg" asChild>
+          <Button
+            className="flex min-h-[48px] w-full touch-manipulation text-base sm:min-h-[44px] sm:w-auto sm:text-lg md:w-42"
+            size="lg"
+            asChild
+          >
             <Link
               target={
                 env.NEXT_PUBLIC_STATIC_WEBSITE_ONLY ? "_blank" : undefined

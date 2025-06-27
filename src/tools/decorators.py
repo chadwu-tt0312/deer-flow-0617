@@ -4,6 +4,7 @@
 import logging
 import functools
 from typing import Any, Callable, Type, TypeVar
+from src.utils.logging_config import ensure_thread_context_decorator
 
 logger = logging.getLogger(__name__)
 
@@ -21,13 +22,12 @@ def log_io(func: Callable) -> Callable:
         The wrapped function with input/output logging
     """
 
+    @ensure_thread_context_decorator
     @functools.wraps(func)
     def wrapper(*args: Any, **kwargs: Any) -> Any:
         # Log input parameters
         func_name = func.__name__
-        params = ", ".join(
-            [*(str(arg) for arg in args), *(f"{k}={v}" for k, v in kwargs.items())]
-        )
+        params = ", ".join([*(str(arg) for arg in args), *(f"{k}={v}" for k, v in kwargs.items())])
         logger.info(f"Tool {func_name} called with parameters: {params}")
 
         # Execute the function
@@ -47,24 +47,21 @@ class LoggedToolMixin:
     def _log_operation(self, method_name: str, *args: Any, **kwargs: Any) -> None:
         """Helper method to log tool operations."""
         tool_name = self.__class__.__name__.replace("Logged", "")
-        params = ", ".join(
-            [*(str(arg) for arg in args), *(f"{k}={v}" for k, v in kwargs.items())]
-        )
+        params = ", ".join([*(str(arg) for arg in args), *(f"{k}={v}" for k, v in kwargs.items())])
         logger.debug(f"Tool {tool_name}.{method_name} called with parameters: {params}")
 
     def _run(self, *args: Any, **kwargs: Any) -> Any:
         """Override _run method to add logging."""
         self._log_operation("_run", *args, **kwargs)
         result = super()._run(*args, **kwargs)
-        logger.debug(
-            f"Tool {self.__class__.__name__.replace('Logged', '')} returned: {result}"
-        )
+        logger.debug(f"Tool {self.__class__.__name__.replace('Logged', '')} returned: {result}")
         return result
 
 
 def create_logged_tool(base_tool_class: Type[T]) -> Type[T]:
     """
     Factory function to create a logged version of any tool class.
+    The created tool class will automatically handle thread context.
 
     Args:
         base_tool_class: The original tool class to be enhanced with logging
@@ -74,7 +71,10 @@ def create_logged_tool(base_tool_class: Type[T]) -> Type[T]:
     """
 
     class LoggedTool(LoggedToolMixin, base_tool_class):
-        pass
+        @ensure_thread_context_decorator
+        def _run(self, *args: Any, **kwargs: Any) -> Any:
+            """Override _run method to add logging and thread context support."""
+            return super()._run(*args, **kwargs)
 
     # Set a more descriptive name for the class
     LoggedTool.__name__ = f"Logged{base_tool_class.__name__}"

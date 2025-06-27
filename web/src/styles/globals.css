@@ -218,3 +218,93 @@ textarea {
 button {
   cursor: pointer;
 }
+
+/* 確保文字能正確換行 */
+.break-words {
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
+.overflow-wrap-anywhere {
+  overflow-wrap: anywhere;
+}
+
+/* Activities 區塊特定的文字換行規則 */
+.prose {
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
+.prose p,
+.prose div,
+.prose span {
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
+/* Activities 區塊 prose 內容的額外樣式 */
+.prose-content {
+  word-wrap: break-word;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  hyphens: auto;
+  width: 100%;
+  max-width: 100%;
+}
+
+.prose-content .prose {
+  max-width: none !important;
+  width: 100% !important;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.prose-content .prose p,
+.prose-content .prose div,
+.prose-content .prose span,
+.prose-content .prose li,
+.prose-content .prose blockquote,
+.prose-content .prose h1,
+.prose-content .prose h2,
+.prose-content .prose h3,
+.prose-content .prose h4,
+.prose-content .prose h5,
+.prose-content .prose h6 {
+  word-wrap: break-word;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  white-space: pre-wrap;
+  max-width: 100%;
+}
+
+.prose-content .prose ul,
+.prose-content .prose ol {
+  word-wrap: break-word;
+  overflow-wrap: anywhere;
+  max-width: 100%;
+}
+
+/* 確保編號列表項目正確換行 */
+.prose-content .prose li {
+  max-width: 100%;
+  overflow: hidden;
+  word-wrap: break-word;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+/* 強制長文字換行 */
+.word-break-break-word {
+  word-break: break-word !important;
+  overflow-wrap: anywhere !important;
+  hyphens: auto;
+}
+
+/* 特別處理長 URL 和代碼 */
+.prose-content .prose code,
+.prose-content .prose pre,
+.prose-content .prose a {
+  word-break: break-all;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}

@@ -31,4 +31,6 @@ You are a professional software engineer proficient in Python scripting. Your ta
     - `pandas` for data manipulation
     - `numpy` for numerical operations
     - `yfinance` for financial market data
+    - `matplotlib` for drawing charts
+        - If Chinese fonts are used, "font.family" must be set to "Microsoft JhengHei" (Windows platform) or "SimHei" (Linux platform)
 - Always output in the locale of **{{ locale }}**.

@@ -11,7 +11,6 @@ from src.tools.tavily_search.tavily_search_api_wrapper import (
 
 
 class TestEnhancedTavilySearchAPIWrapper:
-
     @pytest.fixture
     def wrapper(self):
         with patch(
@@ -58,9 +57,7 @@ class TestEnhancedTavilySearchAPIWrapper:
         assert call_args.kwargs["json"]["max_results"] == 10
 
     @patch("src.tools.tavily_search.tavily_search_api_wrapper.requests.post")
-    def test_raw_results_with_all_parameters(
-        self, mock_post, wrapper, mock_response_data
-    ):
+    def test_raw_results_with_all_parameters(self, mock_post, wrapper, mock_response_data):
         mock_response = Mock()
         mock_response.json.return_value = mock_response_data
         mock_response.raise_for_status.return_value = None
@@ -106,9 +103,7 @@ class TestEnhancedTavilySearchAPIWrapper:
 
         # Create mock session that returns the context manager
         mock_session = AsyncMock()
-        mock_session.post = MagicMock(
-            return_value=mock_response_cm
-        )  # Use MagicMock, not AsyncMock
+        mock_session.post = MagicMock(return_value=mock_response_cm)  # Use MagicMock, not AsyncMock
 
         # Create mock session class
         mock_session_cm = AsyncMock()
@@ -134,9 +129,7 @@ class TestEnhancedTavilySearchAPIWrapper:
 
         # Create mock session that returns the context manager
         mock_session = AsyncMock()
-        mock_session.post = MagicMock(
-            return_value=mock_response_cm
-        )  # Use MagicMock, not AsyncMock
+        mock_session.post = MagicMock(return_value=mock_response_cm)  # Use MagicMock, not AsyncMock
 
         # Create mock session class
         mock_session_cm = AsyncMock()
@@ -166,8 +159,8 @@ class TestEnhancedTavilySearchAPIWrapper:
 
         # Test image result
         image_result = result[1]
-        assert image_result["type"] == "image"
-        assert image_result["image_url"] == "https://example.com/image.jpg"
+        assert image_result["type"] == "image_url"
+        assert image_result["image_url"] == {"url": "https://example.com/image.jpg"}
         assert image_result["image_description"] == "Test image description"
 
     def test_clean_results_without_raw_content(self, wrapper):

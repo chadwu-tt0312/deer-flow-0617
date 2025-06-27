@@ -33,7 +33,9 @@ if __name__ == "__main__":
     report_content = open("examples/nanjing_tangbao.md").read()
     final_state = workflow.invoke({"input": report_content})
     for line in final_state["script"].lines:
-        print("<M>" if line.speaker == "male" else "<F>", line.text)
+        speaker_text = f"<M> {line.text}" if line.speaker == "male" else f"<F> {line.text}"
+        logger.info(f"Podcast script line: {speaker_text}")
+        print("<M>" if line.speaker == "male" else "<F>", line.text)  # 保持控制台輸出
 
     with open("final.mp3", "wb") as f:
         f.write(final_state["output"])

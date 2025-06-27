@@ -41,10 +41,10 @@ export async function* chatStream(
     env.NEXT_PUBLIC_STATIC_WEBSITE_ONLY ||
     location.search.includes("mock") ||
     location.search.includes("replay=")
-  ) 
+  )
     return yield* chatReplayStream(userMessage, params, options);
-  
-  try{
+
+  try {
     const stream = fetchStream(resolveServiceURL("chat/stream"), {
       body: JSON.stringify({
         messages: [{ role: "user", content: userMessage }],
@@ -52,14 +52,23 @@ export async function* chatStream(
       }),
       signal: options.abortSignal,
     });
-    
+
     for await (const event of stream) {
-      yield {
-        type: event.event,
-        data: JSON.parse(event.data),
-      } as ChatEvent;
+      try {
+        yield {
+          type: event.event,
+          data: JSON.parse(event.data),
+        } as ChatEvent;
+      } catch (error) {
+        console.error(
+          "Failed to parse event data:",
+          error,
+          "data:",
+          event.data,
+        );
+      }
     }
-  }catch(e){
+  } catch (e) {
     console.error(e);
   }
 }

@@ -4,19 +4,10 @@
 import asyncio
 import logging
 from src.graph import build_graph
+from src.utils.logging_config import setup_deerflow_logging, enable_debug_logging
 
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,  # Default level is INFO
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-)
-
-
-def enable_debug_logging():
-    """Enable debug level logging for more detailed execution information."""
-    logging.getLogger("src").setLevel(logging.DEBUG)
-
-
+# 使用統一的日誌配置
+# 這裡只是設定預設配置，實際的日誌設定會在主程式中進行
 logger = logging.getLogger(__name__)
 
 # Create the graph
@@ -75,9 +66,7 @@ async def run_agent_workflow_async(
         "recursion_limit": 100,
     }
     last_message_cnt = 0
-    async for s in graph.astream(
-        input=initial_state, config=config, stream_mode="values"
-    ):
+    async for s in graph.astream(input=initial_state, config=config, stream_mode="values"):
         try:
             if isinstance(s, dict) and "messages" in s:
                 if len(s["messages"]) <= last_message_cnt:
@@ -85,18 +74,26 @@ async def run_agent_workflow_async(
                 last_message_cnt = len(s["messages"])
                 message = s["messages"][-1]
                 if isinstance(message, tuple):
-                    print(message)
+                    logger.info(f"Message tuple: {message}")
+                    print(message)  # 保持控制台輸出
                 else:
+                    # 記錄到日誌
+                    logger.info(
+                        f"Message: {message.content if hasattr(message, 'content') else str(message)}"
+                    )
                     message.pretty_print()
             else:
                 # For any other output format
-                print(f"Output: {s}")
+                logger.info(f"Stream output: {s}")
+                print(f"Output: {s}")  # 保持控制台輸出
         except Exception as e:
             logger.error(f"Error processing stream output: {e}")
-            print(f"Error processing output: {str(e)}")
+            print(f"Error processing output: {str(e)}")  # 保持控制台輸出
 
     logger.info("Async workflow completed successfully")
 
 
 if __name__ == "__main__":
-    print(graph.get_graph(xray=True).draw_mermaid())
+    mermaid_graph = graph.get_graph(xray=True).draw_mermaid()
+    logger.debug(f"Workflow graph:\n{mermaid_graph}")
+    print(mermaid_graph)

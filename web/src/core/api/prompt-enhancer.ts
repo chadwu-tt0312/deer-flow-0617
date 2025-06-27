@@ -46,9 +46,14 @@ export async function enhancePrompt(
       if (parsed.enhanced_prompt) {
         enhancedPrompt = parsed.enhanced_prompt;
       }
-    } catch {
+    } catch (error) {
       // If parsing fails, use the string as-is (which is what we want)
-      console.log("Using enhanced prompt as-is:", enhancedPrompt);
+      console.log(
+        "Using enhanced prompt as-is:",
+        enhancedPrompt,
+        "error:",
+        error,
+      );
     }
   }
 
