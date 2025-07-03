@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Any, Dict
 import os
 
-from langchain_openai import ChatOpenAI
+from langchain_openai import ChatOpenAI, AzureChatOpenAI
 from langchain_deepseek import ChatDeepSeek
 from typing import get_args
 
@@ -45,9 +45,7 @@ def _get_env_llm_conf(llm_type: str) -> Dict[str, Any]:
     return conf
 
 
-def _create_llm_use_conf(
-    llm_type: LLMType, conf: Dict[str, Any]
-) -> ChatOpenAI | ChatDeepSeek:
+def _create_llm_use_conf(llm_type: LLMType, conf: Dict[str, Any]) -> ChatOpenAI | ChatDeepSeek:
     """Create LLM instance using configuration."""
     llm_type_config_keys = _get_llm_type_config_keys()
     config_key = llm_type_config_keys.get(llm_type)
@@ -70,12 +68,15 @@ def _create_llm_use_conf(
 
     if llm_type == "reasoning":
         merged_conf["api_base"] = merged_conf.pop("base_url", None)
+        return ChatDeepSeek(**merged_conf)
 
-    return (
-        ChatOpenAI(**merged_conf)
-        if llm_type != "reasoning"
-        else ChatDeepSeek(**merged_conf)
-    )
+    # Check if this is Azure OpenAI configuration
+    is_azure = "azure_endpoint" in merged_conf or "azure_deployment" in merged_conf
+
+    if is_azure:
+        return AzureChatOpenAI(**merged_conf)
+    else:
+        return ChatOpenAI(**merged_conf)
 
 
 def get_llm_by_type(

@@ -3,10 +3,10 @@
 # - Replace `api_key` with your own credentials
 # - Replace `base_url` and `model` name if you want to use a custom model
 
-BASIC_MODEL:
-  base_url: "https://api.openai.com/v1"
-  model: "gpt-4.1-mini"
-  api_key: $BASIC_MODEL_API_KEY
+# BASIC_MODEL:
+#   base_url: "https://api.openai.com/v1"
+#   model: "gpt-4.1-mini"
+#   api_key: $BASIC_MODEL_API_KEY
 # BASIC_MODEL:
 #   base_url: "https://generativelanguage.googleapis.com/v1beta/openai/"
 #   model: "gemini-2.0-flash"
@@ -33,7 +33,14 @@ BASIC_MODEL:
 #   base_url: "https://generativelanguage.googleapis.com/v1beta/openai/"
 #   model: "gemini-2.5-flash-preview-04-17-thinking"
 #   api_key: $BASIC_MODEL_API_KEY
-REASONING_MODEL:
-  base_url: "https://api.openai.com/v1"
-  model: "gpt-4.1"
-  api_key: $REASONING_MODEL_API_KEY
+# REASONING_MODEL:
+#   base_url: "https://api.openai.com/v1"
+#   model: "gpt-4.1"
+#   api_key: $REASONING_MODEL_API_KEY
+
+BASIC_MODEL:
+  model: $AZURE_DEPLOYMENT_NAME
+  azure_deployment: $AZURE_DEPLOYMENT_NAME
+  azure_endpoint: $AZURE_OPENAI_ENDPOINT
+  api_version: $BASIC_MODEL_AZURE_API_VERSION
+  api_key: $BASIC_MODEL_API_KEY
